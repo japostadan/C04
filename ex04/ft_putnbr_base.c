@@ -9,7 +9,6 @@
 /*   Updated: 2024/10/28 16:20:23 by japostad         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include <unistd.h>
 
 void	ft_putchar(char c)
@@ -17,74 +16,90 @@ void	ft_putchar(char c)
 	write(1, &c, 1);
 }
 
-int	ft_strlen(char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-
-int	check_base(char *base)
+void	ft_check_base(char *base, int *flag)
 {
 	int	i;
 	int	j;
 
 	i = 0;
-	if (!*base)
-		return (0);
-	while (base[i])
+	j = 0;
+	if (base[0] == '\0' || base[1] == '\0')
+		*flag = 1;
+	while (base[i] && *flag == 0)
 	{
-		if (base[i] == '+' || base[i] == '-')
-			return (0);
-		j = i + 1;
-		while (base[j])
+		j = i;
+		while (base[j] != '\0')
 		{
+			j++;
 			if (base[i] == base[j])
-				return (1);
-			++j;
+				*flag = 1;
 		}
-		++i;
+		if (base[i] == '+' || base[i] == '-' || base[i] == '%'
+			|| base[i] == '/' || base[i] == '*' || base[i] == '='
+			|| base[i] == ',' || base[i] == '.'
+			|| base[i] < 33 || base[i] > 126)
+			*flag = 1;
+		else
+			i++;
 	}
-	if (i < 2)
-		return (1);
-	return (i);
 }
 
 void	ft_putnbr_base(int nbr, char *base)
 {
-	long int	n;
-	int			base_len;
+	int		len_base;
+	int		flag;
+	long	nb;
 
-	n = nbr;
-	base_len = ft_strlen(base);
-	if (check_base(base))
+	len_base = 0;
+	flag = 0;
+	ft_check_base(base, &flag);
+	nb = nbr;
+	if (flag == 0)
 	{
-		if (n < 0)
-		{	
-			ft_putchar('-');
-			n = -n;
-		}
-		if (n < base_len)
-			ft_putchar(base[n]);
-		else
+		if (nb < 0)
 		{
-			ft_putnbr_base(n / base_len, base);
-			ft_putchar(base[n % base_len]);
+			ft_putchar('-');
+			nb *= -1;
+		}
+		while (base[len_base])
+			len_base++;
+		if (nb < len_base)
+			ft_putchar(base[nb]);
+		if (nb >= len_base)
+		{
+			ft_putnbr_base(nb / len_base, base);
+			ft_putnbr_base(nb % len_base, base);
 		}
 	}
 }
 /*
+#include <limits.h>
 int main()
 {
-    ft_putnbr_base(10,"0123456789abcdef");
-	ft_putchar('\n');
-    ft_putnbr_base(4,"01");
-	ft_putchar('\n');
-    ft_putnbr_base(4,"01234567");
-	ft_putchar('\n');
-    ft_putnbr_base(4,"0123456789");
-}
-*/
+write(1, "42:", 3);
+	ft_putnbr_base(42, "0123456789");
+	write(1, "\n2a:", 4);
+	ft_putnbr_base(42, "0123456789abcdef");
+	write(1, "\n-2a:", 5);
+	ft_putnbr_base(-42, "0123456789abcdef");
+	write(1, "\n0:", 3);
+	ft_putnbr_base(0, "0123456789abcdef");
+	write(1, "\nINT_MAX:", 9);
+	ft_putnbr_base(INT_MAX, "0123456789abcdef");
+	write(1, "\nINT_MAX:", 9);
+	ft_putnbr_base(INT_MAX, "ZYXWVUTSRQPONMLKJIHGFEDCBA");
+	write(1, "\nINT_MIN:", 9);
+	ft_putnbr_base(INT_MIN, "0123456789abcdef");
+	write(1, "\n-2143247366 : ", 15);
+	ft_putnbr_base(INT_MIN + 4236282, "'~");
+	write(1, "\n-1:", 4);
+	ft_putnbr_base(-1, "0123456789abcdef");
+	write(1, "\n:", 2);
+	ft_putnbr_base(42, "");
+	write(1, "\n:", 2);
+	ft_putnbr_base(42, "0");
+	write(1, "\n:", 2);
+	ft_putnbr_base(42, "+-0123456789abcdef");
+	write(1, "\n:", 2);
+	ft_putnbr_base(42, "\v0123456789abcdef");
+}*/
